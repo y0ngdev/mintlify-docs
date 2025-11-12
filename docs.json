@@ -19,26 +19,7 @@
     }
   },
   "name": "Unkey Docs",
-  "navbar": {
-    "links": [
-      {
-        "href": "https://unkey.com/blog",
-        "label": "Blog \u0026 Tutorials"
-      },
-      {
-        "href": "https://unkey.com/discord",
-        "label": "Discord"
-      },
-      {
-        "href": "https://app.unkey.com",
-        "label": "Dashboard"
-      }
-    ],
-    "primary": {
-      "href": "https://github.com/unkeyed/unkey",
-      "type": "github"
-    }
-  },
+
   "navigation": {
     "dropdowns": [
       {
@@ -289,40 +270,6 @@
         "icon": "book-open"
       },
       {
-        "dropdown": "api.unkey.dev/v1 (deprecated)",
-        "groups": [
-          {
-            "group": "Introduction",
-            "pages": [
-              "api-reference/v1/overview",
-              "api-reference/v1/authentication",
-              {
-                "group": "Migration Guide",
-                "icon": "arrows-rotate",
-                "pages": [
-                  "api-reference/v1/migration/index",
-                  "api-reference/v1/migration/keys",
-                  "api-reference/v1/migration/apis",
-                  "api-reference/v1/migration/identities",
-                  "api-reference/v1/migration/permissions",
-                  "api-reference/v1/migration/ratelimiting",
-                  "api-reference/v1/migration/analytics",
-                  "api-reference/v1/migration/errors"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Endpoints",
-            "openapi": {
-              "directory": "api-reference/v1",
-              "source": "https://api.unkey.dev/openapi.json"
-            }
-          }
-        ],
-        "icon": "terminal"
-      },
-      {
         "dropdown": "api.unkey.com/v2",
         "groups": [
           {
@@ -343,92 +290,6 @@
           }
         ],
         "icon": "terminal"
-      },
-      {
-        "dropdown": "SDKs",
-        "groups": [
-          {
-            "group": "Official Libraries",
-            "icon": "code",
-            "pages": [
-              {
-                "group": "Typescript",
-                "pages": [
-                  "libraries/ts/api",
-                  {
-                    "group": "@unkey/ratelimit",
-                    "pages": [
-                      "libraries/ts/ratelimit/ratelimit",
-                      {
-                        "group": "Overrides",
-                        "pages": [
-                          "libraries/ts/ratelimit/override/overview",
-                          "libraries/ts/ratelimit/override/set-override",
-                          "libraries/ts/ratelimit/override/get-override",
-                          "libraries/ts/ratelimit/override/list-overrides",
-                          "libraries/ts/ratelimit/override/delete-override"
-                        ]
-                      }
-                    ]
-                  },
-                  "libraries/ts/nextjs",
-                  "libraries/ts/hono",
-                  "libraries/ts/cache/overview"
-                ]
-              },
-              {
-                "group": "Go",
-                "pages": ["libraries/go/api"]
-              },
-              {
-                "group": "Python",
-                "pages": ["libraries/py/api"]
-              }
-            ]
-          },
-          {
-            "group": "Community Libraries",
-            "pages": [
-              {
-                "group": "Elixir",
-                "pages": [
-                  "libraries/ex/overview",
-                  {
-                    "group": "Functions",
-                    "pages": [
-                      "libraries/ex/functions/create_key",
-                      "libraries/ex/functions/verify_key",
-                      "libraries/ex/functions/delete_key",
-                      "libraries/ex/functions/update_key",
-                      "libraries/ex/functions/update_remaining"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Nuxt",
-                "pages": ["libraries/nuxt/overview"]
-              },
-              {
-                "group": "Rust",
-                "pages": ["libraries/rs/overview"]
-              },
-              {
-                "group": "Springboot",
-                "pages": [
-                  "libraries/springboot-java/overview",
-                  "libraries/springboot-java/api/get",
-                  "libraries/springboot-java/api/list",
-                  "libraries/springboot-java/functions/create",
-                  "libraries/springboot-java/functions/revoke",
-                  "libraries/springboot-java/functions/update",
-                  "libraries/springboot-java/functions/verify"
-                ]
-              }
-            ]
-          }
-        ],
-        "icon": "code"
       }
     ]
   },

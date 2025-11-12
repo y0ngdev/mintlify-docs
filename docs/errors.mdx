@@ -3,7 +3,11 @@ title: Error Handling
 description: 'Understanding and working with API errors'
 ---
 
-Error responses maintain the same top-level structure as successful responses, but with an `error` object instead of `data`:
+When an API request fails, the response follows the same overall structure as a successful one. However, instead of a
+`data` object, the JSON will contain an `error` object. The `meta` object, containing the `requestId`, is always
+included.
+
+**Example Error Response:**
 
 ```json
 {
@@ -14,7 +18,7 @@ Error responses maintain the same top-level structure as successful responses, b
     "title": "Validation Error",
     "detail": "You must provide a valid API ID.",
     "status": 400,
-    "type": "https://unkey.com/docs/errors/validation-error",
+    "type": "https://api.example.com/docs/validation-error",
     "errors": [
       {
         "location": "body.apiId",
@@ -26,93 +30,111 @@ Error responses maintain the same top-level structure as successful responses, b
 }
 ```
 
-## Error Format
+### The Error Object Format
 
-Our error format follows RFC7807 Problem Details standard within our consistent envelope structure, providing:
+Our error format is based on the [RFC7807 Problem Details standard](https://tools.ietf.org/html/rfc7807). This provides
+a consistent way to understand what went wrong.
 
-- **title**: A short, human-readable summary of the problem
-- **detail**: A human-readable explanation specific to this occurrence
-- **status**: The HTTP status code (also returned in the HTTP response)
-- **type**: A URI reference that identifies the problem type and points to documentation
-- **errors**: (Optional) An array of specific validation errors when multiple issues occur
+* **`title`**: A short, human-readable summary of the problem.
+* **`detail`**: A more specific explanation of this particular error.
+* **`status`**: The HTTP status code (this matches the code sent in the HTTP response).
+* **`type`**: A link (URI) to documentation that explains this *category* of error.
+* **`errors`**: (Optional) An array of specific field-level errors, used primarily for validation issues.
 
-## Common Error Types
 
-| Status | Error Type | Description |
-|--------|------------|-------------|
-| 400 | validation-error | The request body failed validation |
-| 401 | unauthorized | Missing or invalid authorization |
-| 403 | forbidden | Valid authorization but insufficient permissions |
-| 404 | not-found | The requested resource was not found |
-| 409 | conflict | The request conflicts with the current state |
-| 429 | rate-limited | You've exceeded your rate limit |
-| 500 | internal-server-error | An unexpected error occurred on our servers |
 
-## Validation Errors
+### Common Error Types
 
-For validation errors, we provide detailed information about each failed validation:
+Here are the most frequent errors you'll encounter:
 
-- **location**: Where in the request the error occurred (e.g., `body.name`, `query.limit`)
-- **message**: What went wrong with the specific field
-- **fix**: (When possible) A suggestion for how to fix the issue
+| Status | Error Type            | Description                                                                                                                                        |
+|--------|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 400    | validation-error      | The request body or parameters failed validation.                                                                                                  |
+| 401    | unauthorized          | The request is missing a valid API key.                                                                                                            |
+| 403    | forbidden             | The API key is valid but doesn't have permission for this action.                                                                                  |
+| 404    | not-found             | The resource you asked for doesn't exist.                                                                                                          |
+| 409    | conflict              | The request can't be completed because it conflicts with the current state of the resource (e.g., trying to create something that already exists). |
+| 500    | internal-server-error | An unexpected problem occurred on our side.                                                                                                        |
 
-## Error Recovery
 
-Our error messages are designed to be actionable. Each error includes:
 
-1. A clear explanation of what went wrong
-2. Often, a suggestion for how to fix the issue
-3. For validation errors, the specific fields that failed validation
+### Understanding Validation Errors
 
-## Using the Request ID for Support
+When you receive a `400 validation-error`, check the `errors` array for details on what to fix. Each object in the array
+will tell you:
 
-When reporting issues to our support team, always include the `requestId` from the error response. This unique identifier allows us to quickly locate the specific request in our logs and provide faster, more accurate assistance.
+* **`location`**: The exact field in the request that has a problem (e.g., `body.name`, `query.limit`).
+* **`message`**: A clear explanation of what's wrong with that specific field.
+* **`fix`**: (When possible) A suggested way to correct the problem.
 
-## Error Handling Best Practices
 
-1. **Check for Status Codes**: Always check HTTP status codes first to determine broad error categories
-2. **Extract Error Details**: Parse the error object for detailed information
-3. **Implement Retries Carefully**: Only retry on 5xx errors or when explicitly advised
-4. **Log Complete Errors**: Log the full error response for debugging purposes
 
-Example error handling in JavaScript:
+### Recovering from Errors
+
+Our goal is to make errors easy to fix. Our error messages are actionable and typically include:
+
+1. A clear explanation of the problem.
+2. A suggested fix (when possible).
+3. For validation errors, the specific fields that failed.
+
+
+### Getting Support: Use the Request ID
+
+If you need to contact support, **always include the `requestId`** found in the `meta` object of the response. This ID
+is essential as it allows our team to find the exact failed request in our logs, which leads to much faster and more
+accurate help.
+
+
+
+### Best Practices for Error Handling
+
+1. **Check Status Codes:** Start by checking the HTTP status code (e.g., 404, 500) to understand the general type of
+   error.
+2. **Parse the Error Body:** Don't just check the status. Read the JSON `error` object to get the specific `detail`,
+   `title`, and any validation `errors`.
+3. **Retry with Caution:** Only retry failed requests for 5xx server errors or if the error message explicitly suggests
+   it. Retrying a 4xx error (like a validation error) will just fail again without a change.
+4. **Log Everything:** For debugging, log the *entire* error response body, not just the message. The `requestId` is
+   especially important.
+
+**Example (JavaScript):**
 
 ```javascript
 try {
-  const response = await fetch('https://api.unkey.com/v2/keys.create', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${rootKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(keyData)
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    // Extract and handle the error
-    const { meta, error } = data;
-    console.error(`Error ${error.status}: ${error.title}`, {
-      requestId: meta.requestId,
-      detail: error.detail,
-      docs: error.type
+    const response = await fetch('https://api.example.com/keys/create', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${rootKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(keyData)
     });
 
-    // Handle validation errors specifically
-    if (error.errors) {
-      error.errors.forEach(err => {
-        console.error(`- ${err.location}: ${err.message}`);
-      });
+    const data = await response.json();
+
+    if (!response.ok) {
+        // Extract and handle the error
+        const {meta, error} = data;
+        console.error(`Error ${error.status}: ${error.title}`, {
+            requestId: meta.requestId,
+            detail: error.detail,
+            docs: error.type
+        });
+
+        // Handle validation errors specifically
+        if (error.errors) {
+            error.errors.forEach(err => {
+                console.error(`- ${err.location}: ${err.message}`);
+            });
+        }
+
+        throw new Error(`API Error: ${error.detail}`);
     }
 
-    throw new Error(`API Error: ${error.detail}`);
-  }
-
-  return data.data; // Return just the data portion on success
+    return data.data; // Return just the data portion on success
 } catch (err) {
-  // Handle network errors or other exceptions
-  console.error('Request failed:', err);
-  throw err;
+    // Handle network errors or other exceptions
+    console.error('Request failed:', err);
+    throw err;
 }
 ```

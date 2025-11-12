@@ -1,18 +1,20 @@
 ---
-title: Overview
+title:  Welcome to the API
 description: 'Our philosophy for building developer-friendly APIs'
 ---
 
 
-## Core Principles
+We designed our API from the ground up to be developer-friendly. Our goal is to make your integration as smooth as possible by following three key principles:
 
-- **Clear Communication**: Structured responses make success and failure equally informative
-- **Practical Over Purist**: We make pragmatic choices rather than rigidly adhering to any single paradigm
-- **Predictable Patterns**: Once you learn one endpoint, you'll understand them all
+* **Predictable Patterns**: Once you learn how to use one endpoint, you'll instinctively know how to use all of them.
+* **Practical Design**: We favor practical, real-world solutions over rigid, purist standards.
+* **Clear Communication**: Our structured responses make it easy to understand what happened, whether the request was a success or a failure.
 
-## Response Structure
+### The Standard Response Envelope
 
-All API responses follow a consistent structure, making them predictable and easy to parse:
+All API responses—whether successful or not—follow the same consistent JSON structure. This "envelope" makes it simple to write reusable, reliable code to handle any response.
+
+At a minimum, you'll always receive a `meta` object (for tracking) and a `data` object (for the result).
 
 ```json
 {
@@ -20,12 +22,13 @@ All API responses follow a consistent structure, making them predictable and eas
     "requestId": "req_abc123xyz789"
   },
   "data": {
-    // Operation-specific response data
+    "id": "key_123",
+    "status": "active"
   }
 }
 ```
 
-For paginated responses, we include a pagination object:
+When you request a list of items, we'll also include a `pagination` object to help you navigate large result sets.
 
 ```json
 {
@@ -34,7 +37,8 @@ For paginated responses, we include a pagination object:
     "timestamp": "2023-11-08T15:22:30Z"
   },
   "data": [
-    // Array of items
+   { "id": "item_1" },
+   { "id": "item_2" }
   ],
   "pagination": {
     "cursor": "cursor_xyz123",
@@ -43,47 +47,56 @@ For paginated responses, we include a pagination object:
 }
 ```
 
-## Working with the API
 
-### Always Use the Request ID
 
-Every response includes a unique `requestId` in the metadata. When seeking support or debugging issues, always include this ID as it allows us to trace exactly what happened with your request.
+### Your Debugging Lifeline: The Request ID
 
-You can also search for the `requestId` yourself in the [logs](https://app.unkey.com/logs).
+Every API response, in its `meta` object, includes a unique `requestId`.
 
-### Handling Pagination
+**This is the most important piece of information for debugging.** If you ever encounter an issue or need to contact support, providing this ID allows us to find the exact trace of your request in our logs and help you immediately.
 
-For endpoints that return lists of items:
+You can also use this `requestId` to find the request yourself in the dashboard logs.
 
-1. Make your initial request
-2. Check for `pagination.hasMore` to see if more items exist
-3. If `true`, use the `pagination.cursor` value in your next request
 
-Example:
+### How to Handle Pagination
+
+For any endpoint that returns a list, you'll need to check for pagination.
+
+1.  Make your first request to the list endpoint.
+2.  Check the `pagination.hasMore` boolean.
+3.  If `hasMore` is `true`, it means there are more results available.
+4.  To get the next page, make the **exact same request**, but this time, add the `pagination.cursor` value to your request body.
+
+**Example (JavaScript):**
 
 ```js
-// First request
-const response = await fetch('https://api.unkey.com/v2/keys.listKeys', {
+// Make the first request
+const response = await fetch('https://api.example.com/keys/list', {
   method: 'POST',
   headers: { Authorization: `Bearer ${rootKey}` },
   body: JSON.stringify({ apiId: 'api_123' })
 });
 
-// Follow-up request with cursor
+// Check if there's another page
 if (response.pagination?.hasMore) {
-  const nextPage = await fetch('https://api.unkey.com/v2/keys.listKeys', {
+  
+  // Fetch the next page using the cursor from the first response
+  const nextPage = await fetch('https://api.example.com/keys/list', {
     method: 'POST',
     headers: { Authorization: `Bearer ${rootKey}` },
     body: JSON.stringify({
       apiId: 'api_123',
-      cursor: response.pagination.cursor
+      cursor: response.pagination.cursor // <-- Use the cursor here
     })
   });
 }
 ```
 
-## Versioning
 
-Our API uses a major version in the URL (e.g., `/v2/`) and maintains backwards compatibility within each major version. When we need to make breaking changes, we increment the major version number.
 
-We communicate deprecations well in advance, giving you time to update your integration before endpoints are removed.
+### Our Stability Promise: Versioning
+
+We know that API stability is critical. We use major versioning in the URL path (e.g., `/v2/`) to ensure we can make improvements without breaking your existing integration.
+
+* **No Breaking Changes**: We will **never** introduce a backwards-incompatible change within a major version (like `/v2/`).
+* **Clear Communication**: If we ever need to release a new major version (e.g., `/v3/`), we will announce it well in advance, provide a clear migration guide, and maintain the old version for a generous deprecation period.

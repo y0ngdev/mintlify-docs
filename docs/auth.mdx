@@ -1,76 +1,87 @@
 ---
 title: Authentication
-description: 'Securely authenticating with the Unkey API'
+description: 'Securely authenticating with the  API'
 ---
 
+You'll need a **root key** for almost every API call. This key confirms your identity and your specific permissions,
+determining what you're allowed to do.
 
-Almost all Unkey API endpoints require authentication using a root key. Root keys provide access to your Unkey resources based on their assigned permissions.
+## Using Bearer Tokens
 
-## Bearer Authentication
+We use standard **Bearer Authentication**. This means you must include an `Authorization` header with your root key in
+every request.
 
-Authentication is performed using HTTP Bearer authentication in the `Authorization` header:
+The format is:
 
 ```bash
-Authorization: Bearer unkey_1234567890
+Authorization: Bearer locket_1234567890
 ```
 
-Example request:
+**Example `curl` Request:**
 
 ```bash
-curl -X POST "https://api.unkey.com/v2/keys.createKey" \
-  -H "Authorization: Bearer unkey_1234567890" \
+curl -X POST "https://api.example.com/keys/create" \
+  -H "Authorization: Bearer locket_1234567890" \
   -H "Content-Type: application/json" \
   -d '{ "apiId": "api_1234" }'
 ```
 
-## Security Best Practices
+### Key Security Best Practices
 
-Never expose your root key in client-side code or include it in public repositories. For frontend applications, always use a backend server to proxy requests to the Unkey API.
+**Never** expose your root key in your frontend (client-side) code, such as in a React or Vue application. Never include
+it in a public Git repository.
 
-## Root Key Management
+For web or mobile apps, you should always proxy your requests through a secure backend server, where the root key can be
+stored safely.
 
-Root keys can be created and managed through the Unkey dashboard. We recommend:
+### Managing Your Root Keys
 
-1. **Using Different Keys for Different Environments**: Maintain separate root keys for development, staging, and production
-2. **Rotating Keys Regularly**: Create new keys periodically and phase out old ones
-3. **Setting Clear Key Names**: Name your keys according to their use case for better manageability
+You can create and manage all your root keys from the locket dashboard. For best security and manageability, we
+recommend you:
 
-## Key Permissions System
+1. **Use Separate Keys**: Create different root keys for your development, staging, and production environments.
+2. **Rotate Keys Regularly**: Periodically create new keys and delete old ones to limit exposure.
+3. **Use Clear Names**: Name your keys descriptively (e.g., "Production-User-Service") so you know what each one is for.
 
-Unkey implements a sophisticated RBAC (Role-Based Access Control) system for root keys. Permissions are defined as tuples of:
+### How Permissions Work (RBAC)
 
-- **ResourceType**: The category of resource (api, ratelimit, rbac, identity)
-- **ResourceID**: The specific resource instance
-- **Action**: The operation to perform on that resource
+Root keys use a powerful **Role-Based Access Control (RBAC)** system. Permissions are defined as a "tuple" (a specific
+set) of three parts:
 
-### Available Resource Types
+`ResourceType.ResourceID.Action`
 
-| Resource Type | Description |
-|---------------|-------------|
-| `api` | API-related resources, such as endpoints and keys |
-| `ratelimit` | Rate limiting resources and configuration |
-| `rbac` | Permissions and roles management |
-| `identity` | User and identity management |
+This breaks down as follows:
 
-### Permission Examples
+* **ResourceType**: The category of the resource.
+* **ResourceID**: The specific ID of the resource (or `*` for a wildcard).
+* **Action**: The operation you want to perform (e.g., `read_api`).
 
-Specific permission to manage a single API:
+**Main Resource Types:**
+
+| Resource Type | Description                                     |
+|---------------|-------------------------------------------------|
+| `api`         | Manages your APIs and their keys.               |
+| `rbac`        | Manages the permissions and roles themselves.   |
+| `identity`    | Manages users and identities.                   |
+
+This system lets you be very specific or use a wildcard (`*`) for broader access.
+
+**Permission Examples:**
+
+To grant permissions to read and update *one specific* API:
+
 ```
 api.api_1234.read_api
 api.api_1234.update_api
 ```
 
-Wildcard permission to manage all rate limit namespaces:
-```
-ratelimit.*.create_namespace
-ratelimit.*.read_namespace
-```
 
-When creating root keys, you can specify exactly what actions they're allowed to perform.
+### Handling Auth Errors
 
-## Authentication Errors
+If your authentication fails, you'll receive an error response. The two most common are:
 
-If your authentication fails, you'll receive a 401 Unauthorized or 403 Forbidden response with an error message:
+**401 Unauthorized**
+This means your key is invalid, missing, or has been revoked.
 
 ```json
 {
@@ -80,13 +91,14 @@ If your authentication fails, you'll receive a 401 Unauthorized or 403 Forbidden
   "error": {
     "title": "Unauthorized",
     "detail": "The provided root key is invalid or has been revoked",
-    "status": 401,
-    "type": "https://unkey.com/docs/errors/unauthorized"
+    "status": 401
+    
   }
 }
 ```
 
-If your key is valid but lacks sufficient permissions, you'll receive a 403 Forbidden response:
+**403 Forbidden**
+This means your key is valid, but it doesn't have the *specific permission* required for that action.
 
 ```json
 {
@@ -96,14 +108,14 @@ If your key is valid but lacks sufficient permissions, you'll receive a 403 Forb
   "error": {
     "title": "Forbidden",
     "detail": "Your key does not have the required 'api.api_1234.update_api' permission",
-    "status": 403,
-    "type": "https://unkey.com/docs/errors/forbidden"
+    "status": 403
   }
 }
 ```
 
-Common authentication issues include:
-- Missing the Authorization header
-- Invalid key format
-- Revoked or expired root key
-- Using a key with insufficient permissions
+**Common problems to check:**
+
+* Did you forget the `Authorization` header?
+* Is the key spelled correctly?
+* Has the key been revoked or deleted in the dashboard?
+* Does the key have the correct permissions for this specific action?

@@ -1210,7 +1210,7 @@ info:
   version: 2.0.0
 openapi: 3.1.0
 paths:
-  /v2/apis.createApi:
+  /apis/create:
     post:
       description: |
         Establishes a new API namespace, which serves as a container for organizing keys.
@@ -1264,7 +1264,7 @@ paths:
       tags:
         - apis
       x-speakeasy-name-override: createApi
-  /v2/apis.deleteApi:
+  /apis/delete:
     post:
       description: |
         Permanently deletes an API namespace and invalidates all associated keys.
@@ -1330,7 +1330,7 @@ paths:
       tags:
         - apis
       x-speakeasy-name-override: deleteApi
-  /v2/apis.getApi:
+  /apis/get:
     post:
       description: |
         Retrieves basic information about an API namespace (ID and name).
@@ -1387,7 +1387,7 @@ paths:
       tags:
         - apis
       x-speakeasy-name-override: getApi
-  /v2/apis.listKeys:
+  /apis.list/:
     post:
       description: |
         Retrieves a paginated list of API keys within a specific API namespace.
@@ -1451,7 +1451,7 @@ paths:
       tags:
         - apis
       x-speakeasy-name-override: listKeys
-  /v2/identities.createIdentity:
+  /identities/create:
     post:
       description: |
         Creates an identity to group multiple API keys under a single entity (like a user or organization).
@@ -1508,7 +1508,7 @@ paths:
       tags:
         - identities
       x-speakeasy-name-override: createIdentity
-  /v2/identities.deleteIdentity:
+  /identities/delete:
     post:
       description: |
         Permanently deletes an identity. This action cannot be undone.
@@ -1567,7 +1567,7 @@ paths:
       tags:
         - identities
       x-speakeasy-name-override: deleteIdentity
-  /v2/identities.getIdentity:
+  /identities/get:
     post:
       description: |
         Retrieves an identity by its external ID or internal ID.
@@ -1624,7 +1624,7 @@ paths:
       tags:
         - identities
       x-speakeasy-name-override: getIdentity
-  /v2/identities.listIdentities:
+  /identities/list:
     post:
       description: |
         Gets a paginated list of all identities in the workspace.
@@ -1675,7 +1675,7 @@ paths:
       tags:
         - identities
       x-speakeasy-name-override: listIdentities
-  /v2/identities.updateIdentity:
+  /identities/update:
     post:
       description: |
         Updates an identity's metadata and/or rate limits.
@@ -1735,7 +1735,7 @@ paths:
       tags:
         - identities
       x-speakeasy-name-override: updateIdentity
-  /v2/permissions.createPermission:
+  /permissions/create:
     post:
       description: |
         Creates a new permission for the RBAC system. Permissions can be assigned directly to keys or grouped into roles.
@@ -1794,7 +1794,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: CreatePermission
-  /v2/permissions.createRole:
+  /permissions/create:
     post:
       description: |
         Creates a new role to group related permissions. Roles simplify assigning consistent permissions to multiple keys.
@@ -1852,7 +1852,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: CreateRole
-  /v2/permissions.deletePermission:
+  /permissions/delete:
     post:
       description: |
         Removes a permission from the workspace. This also removes the permission from all associated keys and roles.
@@ -1910,7 +1910,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: DeletePermission
-  /v2/permissions.deleteRole:
+  /permissions/delete:
     post:
       description: |
         Removes a role from the workspace. This also removes the role from all assigned keys.
@@ -1962,7 +1962,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: DeleteRole
-  /v2/permissions.getPermission:
+  /permissions/get:
     post:
       description: |
         Retrieves details about a specific permission by its ID or slug.
@@ -2018,7 +2018,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: GetPermission
-  /v2/permissions.getRole:
+  /permissions/get:
     post:
       description: |
         Retrieves details about a specific role (by ID or name), including its assigned permissions.
@@ -2074,7 +2074,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: GetRole
-  /v2/permissions.listPermissions:
+  /permissions/list:
     post:
       description: |
         Retrieves all permissions in the workspace. Results are paginated.
@@ -2124,7 +2124,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: ListPermissions
-  /v2/permissions.listRoles:
+  /permissions/list:
     post:
       description: |
         Retrieves all roles in the workspace, including their assigned permissions. Results are paginated.

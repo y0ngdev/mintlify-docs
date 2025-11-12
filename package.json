@@ -6,7 +6,7 @@
     "dev": "mintlify dev"
   },
   "keywords": [],
-  "author": "Andreas Thomas & James Perkins",
+  "author": "Prosper",
   "devDependencies": {
     "mintlify": "^4.2.144"
   },

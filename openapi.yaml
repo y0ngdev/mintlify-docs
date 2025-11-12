@@ -1794,7 +1794,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: CreatePermission
-  /permissions/create:
+  /permissions/role/create:
     post:
       description: |
         Creates a new role to group related permissions. Roles simplify assigning consistent permissions to multiple keys.
@@ -1910,7 +1910,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: DeletePermission
-  /permissions/delete:
+  /permissions/role/delete:
     post:
       description: |
         Removes a role from the workspace. This also removes the role from all assigned keys.
@@ -1962,7 +1962,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: DeleteRole
-  /permissions/get:
+  /permissions.getPermission:
     post:
       description: |
         Retrieves details about a specific permission by its ID or slug.
@@ -2018,7 +2018,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: GetPermission
-  /permissions/get:
+  /permissions/role/get:
     post:
       description: |
         Retrieves details about a specific role (by ID or name), including its assigned permissions.
@@ -2074,7 +2074,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: GetRole
-  /permissions/list:
+  /permissions.listPermissions:
     post:
       description: |
         Retrieves all permissions in the workspace. Results are paginated.
@@ -2124,7 +2124,7 @@ paths:
       tags:
         - permissions
       x-speakeasy-name-override: ListPermissions
-  /permissions/list:
+  /permissions/role/list:
     post:
       description: |
         Retrieves all roles in the workspace, including their assigned permissions. Results are paginated.
